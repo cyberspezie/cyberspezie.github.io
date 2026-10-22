@@ -2,7 +2,7 @@
 <html lang="en" class="w-full h-full overflow-hidden">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>cyberspezie — portfolio</title>
   <!-- SEO:START (written by tools/build-seo.js: edit there, not here) -->
   <meta name="google-site-verification" content="0aWvqDtBxg0HKCnZ7jw_tnNbqx0Z16egLxG6sRga-VE">
@@ -420,6 +420,61 @@
       margin: 0;
       padding: 0;
     }
+    /* phones: the page is dark (Safari draws its toolbar dark, not light grey) and runs under the
+       browser bars (viewport-fit=cover, iOS 26 "Liquid Glass"); every button stays clear of them:
+       1.5rem from the edge, or the system's safe area + 0.75rem when that is larger (notch, home
+       bar, landscape). Desktop and screens without insets: exactly 1.5rem, as before */
+    :root {
+      color-scheme: dark;
+      --edge-t: max(1.5rem, calc(env(safe-area-inset-top) + 0.75rem));
+      --edge-b: max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem));
+      --edge-l: max(1.5rem, calc(env(safe-area-inset-left) + 0.75rem));
+      --edge-r: max(1.5rem, calc(env(safe-area-inset-right) + 0.75rem));
+    }
+
+    /* embedded pages keep their own (light) scheme: with the dark page around them the browser
+       otherwise painted an opaque dark grey behind the sketch's empty corners */
+    iframe {
+      color-scheme: normal;
+    }
+
+    aside[data-corner].top-6 { top: var(--edge-t); }
+    aside[data-corner].bottom-6 { bottom: var(--edge-b); }
+    aside[data-corner].left-6 { left: var(--edge-l); }
+    aside[data-corner].right-6 { right: var(--edge-r); }
+
+    /* phones only: the generative landscape (canvas + grid) runs under the browser bars; the
+       title and the corner buttons stay in the visible area (--vvh = visible height, set by
+       syncVisibleHeight). Desktop untouched */
+    @media (max-width: 767px) {
+      .swiss-grid-overlay {
+        bottom: auto;
+        height: 100vh;
+        height: 100lvh;
+      }
+
+      #landing-hero {
+        bottom: auto;
+        height: var(--vvh, 100%);
+      }
+
+      aside[data-corner].bottom-6 {
+        bottom: auto;
+        top: calc(var(--vvh, 100vh) - var(--edge-b));
+        transform: translateY(-100%);
+      }
+    }
+
+    #btn-project-back {
+      top: var(--edge-t);
+      left: var(--edge-l);
+    }
+
+    #project-page-view {
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
     html, body {
       background-color: #000000;
       color: #ffffff;
@@ -1415,9 +1470,9 @@
     /* same corners as the back button (1.5rem) */
     #lb-bar {
       position: absolute;
-      top: 1.5rem;
-      left: 1.5rem;
-      right: 1.5rem;
+      top: var(--edge-t);
+      left: var(--edge-l);
+      right: var(--edge-r);
       z-index: 1;
       display: flex;
       align-items: center;
@@ -1435,7 +1490,7 @@
     /* bottom corners: − / + on the left, ← / → on the right (1.5rem from the edges) */
     .lb-corner {
       position: absolute;
-      bottom: 1.5rem;
+      bottom: var(--edge-b);
       z-index: 1;
       display: flex;
       gap: 0.5rem;
@@ -1443,11 +1498,11 @@
 
     #lb-zoom,
     #lb-sound {
-      left: 1.5rem;       /* a video with sound: sound on / off in place of − / + */
+      left: var(--edge-l);       /* a video with sound: sound on / off in place of − / + */
     }
 
     #lb-nav {
-      right: 1.5rem;
+      right: var(--edge-r);
     }
 
     #lightbox .swiss-btn {
@@ -1474,7 +1529,7 @@
     /* between the top and bottom corner buttons */
     #lb-stage {
       position: absolute;
-      inset: 4.5rem 0;
+      inset: calc(var(--edge-t) + 3rem) 0 calc(var(--edge-b) + 3rem);
       overflow: hidden;
     }
 
@@ -1533,7 +1588,7 @@
   <canvas id="contour-canvas"></canvas>
 
   <!-- 2. Dead-Center Hero: "cyberspezie" with Dynamic Letter Intersections -->
-  <main class="fixed inset-0 z-10 pointer-events-none flex flex-col items-center justify-center p-6 select-none text-white">
+  <main id="landing-hero" class="fixed inset-0 z-10 pointer-events-none flex flex-col items-center justify-center p-6 select-none text-white">
     <div id="hero-kicker" class="flex items-center space-x-2 mb-3 font-mono text-[0.5625rem] sm:text-[0.625rem] tracking-widest text-neutral-400 uppercase">
       <span>[portfolio]</span>
     </div>
@@ -1550,7 +1605,7 @@
 
   <!-- 3. Swiss Grid Navigation & Interactive Action Controls -->
   <!-- Top-Left: About Me Button -->
-  <aside class="fixed top-6 left-6 z-30 pointer-events-auto">
+  <aside data-corner class="fixed top-6 left-6 z-30 pointer-events-auto">
     <button id="btn-about-me" class="swiss-btn px-4 py-2 flex items-center space-x-2 shadow-lg">
       <span class="text-xs">✶</span>
       <span>about me</span>
@@ -1558,14 +1613,14 @@
   </aside>
 
   <!-- Top-Right: Persistent Index Button -->
-  <aside class="fixed top-6 right-6 z-30 pointer-events-auto">
+  <aside data-corner class="fixed top-6 right-6 z-30 pointer-events-auto">
     <button id="btn-index-toggle" class="swiss-btn px-3 py-2 flex items-center space-x-2 shadow-lg">
       <span>index (10)</span>
       <span class="text-[0.5625rem]">■</span>
     </button>
   </aside>
   <!-- Bottom-Left: Email dispatch -->
-  <aside class="fixed bottom-6 left-6 z-30 pointer-events-auto">
+  <aside data-corner class="fixed bottom-6 left-6 z-30 pointer-events-auto">
     <button id="btn-email-me" class="swiss-btn px-4 py-2 flex items-center space-x-2 shadow-lg">
       <span class="text-xs">✏</span>
       <span>email me</span>
@@ -1573,7 +1628,7 @@
   </aside>
 
   <!-- Bottom-Right: Online networks -->
-  <aside class="fixed bottom-6 right-6 z-30 pointer-events-auto">
+  <aside data-corner class="fixed bottom-6 right-6 z-30 pointer-events-auto">
     <button id="btn-find-online" class="swiss-btn px-4 py-2 flex items-center space-x-2 shadow-lg">
       <span>find me online</span>
       <span class="text-[0.625rem]">⊕</span>
@@ -2973,7 +3028,7 @@
       const bW = bufferCanvas.width;
       const bH = bufferCanvas.height;
       const winW = window.innerWidth;
-      const winH = window.innerHeight;
+      const winH = mapH();
 
       const heroEl = document.getElementById('hero-title');
       state.glyphAnchors = [];
@@ -2994,10 +3049,35 @@
       }
     }
 
+    /* Phones (< 768px): the landscape is drawn down to the bottom of the screen, under the browser
+       bars (the "large" viewport, 100lvh); stars, labels and title stay in the visible part
+       (window.innerHeight). Everything that maps the drawing to the screen uses mapH(): on desktop
+       it is window.innerHeight exactly as before */
+    const isPhoneView = () => window.matchMedia('(max-width: 767px)').matches;
+    let lvhProbe = null;
+    function largeViewportHeight() {
+      if (!lvhProbe) {
+        lvhProbe = document.createElement('div');
+        lvhProbe.setAttribute('aria-hidden', 'true');
+        lvhProbe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:100vh;height:100lvh;visibility:hidden;pointer-events:none';
+        document.body.appendChild(lvhProbe);
+      }
+      return lvhProbe.offsetHeight;
+    }
+    const mapH = () => (isPhoneView() && canvas.clientHeight) ? canvas.clientHeight : window.innerHeight;
+    function syncVisibleHeight() {
+      const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      document.documentElement.style.setProperty('--vvh', `${Math.round(h)}px`);
+    }
+    syncVisibleHeight();
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', syncVisibleHeight);
+    window.addEventListener('resize', syncVisibleHeight);
+
     function resizeCanvas() {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       const width = Math.max(window.innerWidth || 0, document.documentElement.clientWidth || 0, 320);
-      const height = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 320);
+      let height = Math.max(window.innerHeight || 0, document.documentElement.clientHeight || 0, 320);
+      if (isPhoneView()) height = Math.max(height, largeViewportHeight());   // phones: under the bars too
 
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
@@ -3034,7 +3114,7 @@
       if (!letters.length) return;
 
       const winW = window.innerWidth;
-      const winH = window.innerHeight;
+      const winH = mapH();
 
       letters.forEach(letter => {
         const rect = letter.getBoundingClientRect();
@@ -3090,7 +3170,7 @@
       state.time += 0.016;
 
       const mx = (state.mouse.x / window.innerWidth) * bW;
-      const my = (state.mouse.y / window.innerHeight) * bH;
+      const my = (state.mouse.y / mapH()) * bH;
       const hasMouse = state.mouse.x > 0 && state.mouse.y > 0;
 
       const freq = state.noiseFreq;
@@ -3105,10 +3185,10 @@
       const heroEl = document.getElementById('hero-title');
       const heroRect = heroEl ? heroEl.getBoundingClientRect() : null;
       const centerBufX = heroRect ? ((heroRect.left + heroRect.width * 0.51) / window.innerWidth) * bW : bW * 0.5;
-      const centerBufY = heroRect ? ((heroRect.top + heroRect.height * 0.5) / window.innerHeight) * bH : bH * 0.5;
+      const centerBufY = heroRect ? ((heroRect.top + heroRect.height * 0.5) / mapH()) * bH : bH * 0.5;
       
       const titleW = heroRect ? (heroRect.width / window.innerWidth) * bW : 90;
-      const titleH = heroRect ? (heroRect.height / window.innerHeight) * bH : 30;
+      const titleH = heroRect ? (heroRect.height / mapH()) * bH : 30;
       const titleRadX = titleW * 0.58;
       const titleRadY = Math.max(titleH * 1.45, titleRadX * 0.52);
 
@@ -3411,7 +3491,7 @@
       const bW = bufferCanvas.width;
       const bH = bufferCanvas.height;
       const winW = window.innerWidth;
-      const winH = window.innerHeight;
+      const winH = mapH();
 
       if (blobs && blobs.length > 50) {
         for (let attempt = 0; attempt < 45; attempt++) {
@@ -3728,7 +3808,8 @@
       const bW = bufferCanvas.width;
       const bH = bufferCanvas.height;
       const winW = window.innerWidth;
-      const winH = window.innerHeight;
+      const winH = window.innerHeight;          // visible area: stars and labels stay inside it
+      const drawH = mapH();                      // the drawing may run further down, under the bars
       if (bW === 0 || bH === 0) return;
 
       const boundaryPadding = 24;
@@ -3745,7 +3826,7 @@
         bottom: heroRect.bottom + 40
       } : null;
 
-      const toScreen = (bx, by) => [(bx / bW) * winW, (by / bH) * winH];
+      const toScreen = (bx, by) => [(bx / bW) * winW, (by / bH) * drawH];
       const sizeOf = node => [
         node.labelBox ? Math.max(140, node.labelBox.offsetWidth + 24) : 160,
         Math.max(26, node.labelBox ? node.labelBox.offsetHeight : 26)
