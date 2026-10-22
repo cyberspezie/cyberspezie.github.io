@@ -44,6 +44,9 @@
     }
 
     body {
+      /* text can't be selected or copied (as on the rest of the site); search engines still read it */
+      -webkit-user-select: none;
+      user-select: none;
       font-family: 'Syne Mono', monospace;
       font-size: 0.8125rem;
       line-height: 1.625;
@@ -108,6 +111,8 @@
     a[data-private-href] {
       -webkit-hyphens: none;     /* the email address is never split with a hyphen */
       hyphens: none;
+      -webkit-user-select: all;  /* the only selectable text: the email address */
+      user-select: all;
     }
 
     a:hover,
