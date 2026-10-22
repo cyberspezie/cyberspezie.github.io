@@ -152,6 +152,20 @@ const replaceBlock = (src, start, end, block, fallbackAnchor, where) => {
 html = html.replace(/<title>[^<]*<\/title>/, `<title>${esc(TITLE)}</title>`);
 html = replaceBlock(html, 'SEO:START', 'SEO:END', head, /<title>[^<]*<\/title>/, 'after');
 html = replaceBlock(html, 'NOSCRIPT:START', 'NOSCRIPT:END', noscript, /<body[^>]*>/, 'after');
+
+// the archive index already written in the page (title, medium, specs, date, in the index order):
+// readers that don't run JavaScript (many AI tools) see the real list of works; the page's own
+// script rebuilds the same rows when it starts (populateIndexList)
+const indexRows = `<!-- INDEX:START (written by tools/build-seo.js; rebuilt by populateIndexList) -->
+${projects.map(p => `            <tr class="group transition-colors cursor-pointer border-b border-white">
+              <td class="py-3.5 pr-4 text-left"><span class="font-lilex font-normal text-xs sm:text-sm text-white">${esc(p.title)}</span></td>
+              <td class="py-3.5 px-4 font-mono text-xs sm:text-sm text-neutral-300"><span>${esc(p.medium)}</span></td>
+              <td class="py-3.5 px-4 font-mono text-xs sm:text-sm text-neutral-400"><span>${esc(p.specs || '')}</span></td>
+              <td class="py-3.5 pl-4 font-mono text-xs sm:text-sm text-white text-right"><span>${esc(p.year)}</span></td>
+            </tr>`).join('\n')}
+            <!-- INDEX:END -->`;
+html = replaceBlock(html, 'INDEX:START', 'INDEX:END', indexRows, /<!-- Dynamically populated rows -->/, 'before');
+html = html.replace(/\n\s*<!-- Dynamically populated rows -->/, '');
 fs.writeFileSync(INDEX, html);
 
 // the 404 page shows the same icons
@@ -171,13 +185,22 @@ fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), `<?xml version="1.0" encoding="
 `);
 
 // images are scrambled mosaics, videos and sketches are only parts of the page: none of them
-// is useful (or wanted) in search results; the page itself and its preview image stay open
+// is useful (or wanted) in search results; the page itself and its preview image stay open.
+// AI training is refused (artist's choice): the robots that collect pages to train AI models are
+// blocked; Google search and AI assistants that read the page when someone asks (searches) are not
+const AI_TRAINING = ['GPTBot', 'ClaudeBot', 'anthropic-ai', 'Google-Extended', 'Applebot-Extended', 'CCBot',
+  'meta-externalagent', 'FacebookBot', 'Bytespider', 'Amazonbot', 'cohere-training-data-crawler', 'Diffbot',
+  'omgili', 'Timpibot', 'ImagesiftBot'];
 fs.writeFileSync(path.join(ROOT, 'robots.txt'), `User-agent: *
 Allow: /
 Disallow: /images/
 Disallow: /videos/
 Disallow: /sketches/
 Disallow: /tools/
+
+# no AI training on this site
+${AI_TRAINING.map(b => `User-agent: ${b}`).join('\n')}
+Disallow: /
 
 Sitemap: ${SITE}sitemap.xml
 `);
