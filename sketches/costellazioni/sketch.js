@@ -16,6 +16,14 @@ let insiemeCerchi = [];
 let i = 0;
 let stella;
 
+//phones only (the portfolio page narrower than 768px): the stars shrink in proportion to the sketch,
+//as if it were 1100px wide (on a phone the 165px gif filled the whole small sketch); desktop unchanged
+function starScale(){
+  let pageWidth = window.innerWidth;
+  try { pageWidth = window.parent.innerWidth; } catch (e) {}
+  return pageWidth < 768 ? Math.min(1, window.innerWidth / 1100) : 1;
+}
+
 //function that connects two circles together
 function collega(){
   if(insiemeCerchi.length < 2) return;
@@ -40,7 +48,8 @@ function setup(){
 function draw(){
   
   //draw the circle and add it to the list
-  insiemeCerchi.push(new Cerchio(floor(random(50, window.innerWidth-90)), floor(random(50, window.innerHeight-90)), 50));
+  let s = starScale();
+  insiemeCerchi.push(new Cerchio(floor(random(50*s, window.innerWidth-90*s)), floor(random(50*s, window.innerHeight-90*s)), 50*s));
   if(i == insiemeCerchi.length) return;
   let c = insiemeCerchi[i];
   noStroke();
@@ -49,7 +58,8 @@ function draw(){
   
   //add the star gif
   stella = createImg('stella.gif', '');
-  stella.position(c.x-100, c.y-100);
+  if (s < 1) stella.size(165*s, AUTO);   //phones: smaller star (desktop: the gif's own size)
+  stella.position(c.x-100*s, c.y-100*s);
 
   stroke(255);
   collega();    //connect the two stars
