@@ -1,2 +1,8 @@
 CLAUDE.md
 .DS_Store
+
+# Claude Code ctags index
+.claude/tags
+
+# sfondo per il banner (solo locale)
+banner/

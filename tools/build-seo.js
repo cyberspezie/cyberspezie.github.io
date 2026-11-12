@@ -40,7 +40,7 @@ const PERSON = {
     // 3D, scanning, AR
     'photogrammetry', '3D scanning', '3D modeling', 'augmented reality', 'Adobe Aero',
     // AI
-    'artificial intelligence', 'AI integration', 'Fal.ai', 'AI sound',
+    'artificial intelligence', 'AI integration', 'fal.ai', 'AI sound',
     // film and photography
     'film', 'short film', 'film direction', 'directing', 'pre-production', 'storyboarding', 'video production',
     'videography', 'camera operation', 'video editing', 'film editing', 'post-production', 'photography',

@@ -66,11 +66,12 @@ const WORKS = {                         // pptx image numbers; 1–3 = Fig. 01�
   'cablato-process@7': [122],           // process of cablato: poster of the second video (key cablato-process-07, shown as Process 02)
   'ethereal-burden@2': [123],           // ethereal burden: poster of the presentation video = new Fig. 00 (key ethereal-burden-02, first in figures)
   'ethereal-burden@3': [124],           // ethereal burden: poster of the reel (vertical video, Fig. 02)
-  'ethereal-burden@4': [125],           // ethereal burden: poster of the "how it works" video (Fig. 03)
+  'ethereal-burden@4': [125],           // ethereal burden: poster of the "how it works" video (Fig. 03) — replaced 2026-11-12 with the updated video
   'ethereal-burden-process': [126, 127, 128], // process of ethereal burden: posters of three silent videos (soldering, carpentry, cables)
   'ethereal-burden@5': [129],           // ethereal burden: poster of the small decorative video (glowing light)
   '705hz@5': [130],                     // 705Hz: poster of the performance video with sound = new Fig. 00 (key 705hz-05, first in figures)
-  'petri-web@4': [131]                  // petri web: poster of the screen recording (silent) = new Fig. 00 (key petri-web-04, first in figures)
+  'petri-web@4': [131],                 // petri web: poster of the screen recording (silent) = new Fig. 00 (key petri-web-04, first in figures)
+  'ethereal-burden-process@4': [132]    // process of ethereal burden 04 = sketch of the installation (projection moodboard, platforms, weight sensors, Arduino)
 };
 const NO_THUMB = new Set(['about', 'cablato-process', 'nostalgic-path-process', '705hz-process', 'ethereal-burden-process']);
 
