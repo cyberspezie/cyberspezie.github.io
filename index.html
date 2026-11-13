@@ -1067,6 +1067,19 @@
       text-underline-offset: 4px;
     }
 
+    /* links on credit names: invisible (same as the text) until hover, then light grey */
+    .pp-credit-link {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .pp-credit-link:hover,
+    .pp-credit-link:focus-visible {
+      color: rgba(255, 255, 255, 0.55);
+      outline: none;
+    }
+
     /* credits: a row of the caption under Medium / Specs / Date, as wide as all three */
     #pp-credits-cell {
       grid-column: 1 / -1;
@@ -2199,7 +2212,7 @@
       {
         id: "cablato",
         title: "cablato",
-        credits: [["CO-DIRECTOR & CAM OPERATOR", "Mario Sinatra"], ["SOUND FX PRODUCTION", "Biocym"]],   // roles in capitals (artist)
+        credits: [["CO-DIRECTOR & CAM OPERATOR", "Mario Sinatra", { "Mario Sinatra": "https://www.linkedin.com/in/mariosinatra/" }], ["SOUND FX PRODUCTION", "Biocym", { "Biocym": "https://www.instagram.com/r_biocym/" }]],   // roles in capitals (artist)
         translation: "wired",
         medium: "shortfilm",
         specs: "3′ 50″",
@@ -2249,7 +2262,7 @@
       {
         id: "705hz",
         title: "705Hz",
-        credits: [["CO-AUTHORED WITH", "Valentina Simonetti and Maristella Ferraiuolo"]],   // role in capitals, as in cablato (artist)
+        credits: [["CO-AUTHORED WITH", "Valentina Simonetti and Maristella Ferraiuolo", { "Valentina Simonetti": "https://www.linkedin.com/in/valentina-simonetti-9b7730256/", "Maristella Ferraiuolo": "https://www.linkedin.com/in/maristella-ferraiuolo-7291ab34b/" }]],   // role in capitals, as in cablato (artist)
         medium: "av interactive installation",
         specs: "fl studio + touchdesigner + kinect",
         year: "june 2025",
@@ -4540,12 +4553,27 @@
       ppYear.textContent = proj.year;
       ppSpecs.textContent = proj.specs || '';
       // one line per credit: the role in the caption font, the names in the body font
-      ppCredits.replaceChildren(...(proj.credits || []).map(([role, names]) => {
+      // optional third item { name: href }: that name becomes a link that looks like plain text (grey on hover)
+      ppCredits.replaceChildren(...(proj.credits || []).map(([role, names, links = {}]) => {
         const row = document.createElement('span');
         row.className = 'block';
         const who = document.createElement('span');
         who.className = 'font-mono';
-        who.textContent = names;
+        let rest = names;
+        while (rest) {
+          const hits = Object.keys(links).map(n => [rest.indexOf(n), n]).filter(([i]) => i >= 0).sort((a, b) => a[0] - b[0]);
+          if (!hits.length) { who.append(rest); break; }
+          const [i, n] = hits[0];
+          if (i) who.append(rest.slice(0, i));
+          const a = document.createElement('a');
+          a.className = 'pp-credit-link';
+          a.href = links[n];
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.textContent = n;
+          who.append(a);
+          rest = rest.slice(i + n.length);
+        }
         row.append(`${role} `, who);
         return row;
       }));
